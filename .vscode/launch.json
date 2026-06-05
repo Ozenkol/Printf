@@ -22,7 +22,6 @@
             "runToEntryPoint": "main",
 
             "gdbPath": "C:/ST/STM32CubeCLT_1.21.0/GNU-tools-for-STM32/bin/arm-none-eabi-gdb.exe",
-
             "swoConfig": {
                 "enabled": true,
                 "cpuFrequency": 168000000,

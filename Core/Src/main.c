@@ -24,6 +24,8 @@
 #include "stdio.h"
 #include <u8x8.h>
 #include <u8g2.h>
+#include "UI/widget.h"
+#include "UI/button_widget.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -162,36 +164,43 @@ int main(void)
   u8g2_Setup_sh1106_128x64_noname_f(&myDisplay, U8G2_R0, u8x8_spi, u8x8_gpio_and_delay);  // Инициализация u8g2-структуры
   u8g2_InitDisplay(&myDisplay); // Отправка последовательности инициализации на дисплей, после чего дисплей переходит в спящий режим
   u8g2_SetPowerSave(&myDisplay, 0); // Пробуждение дисплея
+  u8g2_ClearBuffer(&myDisplay);
 
-  u8g2_ClearDisplay(&myDisplay);
-  u8g2_SetFont(&myDisplay, u8g2_font_cu12_t_cyrillic);
-  u8g2_DrawUTF8(&myDisplay, 0, 15, "Hello world");
-  u8g2_DrawCircle(&myDisplay, 60, 30, 10, U8G2_DRAW_ALL);
-  u8g2_SendBuffer(&myDisplay);
 
   int count = 0;
 
   char buffer[50];
-  snprintf(buffer, sizeof(buffer), "%d", count);
+  // snprintf(buffer, sizeof(buffer), "%d", count);
 
+  // ButtonState   btn_state1  = { .label = "Сәлем Әлем!", .on_press = NULL };
+  // ButtonState   btn_state2  = { .label = "Батырма басылды!", .on_press = NULL };
+  // Widget btn_widget = { .on_event = button_on_event, .render = button_render,
+  //                         .state = &btn_state1, .dirty = true };
+
+  // Widget btn_widget2 = { .on_event = button_on_event, .render = button_render,
+  //                         .state = &btn_state2, .dirty = true };
+  // btn_widget.render(&btn_widget, &myDisplay);
+  //   u8g2_SendBuffer(&myDisplay);
   while (1)
   {
-    if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_RESET)
-    {
-      HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
-      printf("Обнаружена препятствие!\n");
-      u8g2_ClearBuffer(&myDisplay);
-      u8g2_DrawUTF8(&myDisplay, 0, 15, "Обнаружено препятствие!");
-      u8g2_DrawUTF8(&myDisplay, 0, 30, "Пожалуйста, уберите его!");
-      u8g2_DrawUTF8(&myDisplay, 0, 45, buffer);
-      u8g2_DrawCircle(&myDisplay, 60, 50, 10, U8G2_DRAW_ALL);
-      HAL_Delay(500); // Дебаунсинг
-      u8g2_SendBuffer(&myDisplay);
-      count++;
-      snprintf(buffer, sizeof(buffer), "%d", count);
-    }
+    
     /* USER CODE END WHILE */
-
+    // if (HAL_GPIO_ReadPin(Input_signal_GPIO_Port, Input_signal_Pin) == GPIO_PIN_SET) {
+    //     count++;
+    //     snprintf(buffer, sizeof(buffer), "%d", count);
+    //     btn_state2.label = buffer;
+    //     btn_widget2.dirty = true;
+    // }
+    // u8g2_DrawArc(&myDisplay, 64, 32, 30, 0, count * 6);
+    // if (btn_widget2.dirty) {
+    //     btn_widget2.render(&btn_widget2, &myDisplay);
+    // }
+    u8g2_SetDrawColor(&myDisplay, 1);
+    u8g2_DrawBox(&myDisplay, 0, 0, 127, 16);
+    u8g2_DrawRFrame(&myDisplay, 0, 18, 127, 16, 3);
+    u8g2_DrawTriangle(&myDisplay, 64, 50, 54, 60, 74, 60);
+    u8g2_SendBuffer(&myDisplay);
+    count++;
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

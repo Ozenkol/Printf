@@ -15,5 +15,6 @@
         "--query-driver=${env:CUBE_BUNDLE_PATH}/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-g++*"
     ],
     "files.encoding": "utf8",
-    "terminal.integrated.defaultEncoding": "utf8"
+    "terminal.integrated.defaultEncoding": "utf8",
+    "C_Cpp.errorSquiggles": "disabled",
 }
