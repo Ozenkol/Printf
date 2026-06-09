@@ -34,6 +34,7 @@ enable_language(C ASM)
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME}
     Core/Src/UI/button_widget.c
+    Core/Src/UI/ui_grid.c
     )
 
 # Add STM32CubeMX generated sources

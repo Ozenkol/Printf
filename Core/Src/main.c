@@ -21,21 +21,62 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "mui_u8g2.h"
 #include "stdio.h"
 #include <u8x8.h>
 #include <u8g2.h>
 #include "UI/widget.h"
 #include "UI/button_widget.h"
+#include "UI/ui_grid.h"
+#include "mui.h"
 /* USER CODE END Includes */
+uint8_t mui_hrule(mui_t *ui, uint8_t msg)
+{
+  u8g2_t *u8g2 = mui_get_U8g2(ui);
+  switch(msg)
+  {
+    case MUIF_MSG_DRAW:
+      u8g2_DrawHLine(u8g2, 0, mui_get_y(ui), u8g2_GetDisplayWidth(u8g2));
+      break;
+  }
+  return 0;
+}
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+  uint8_t brightness = 25; // Пример переменной для управления яркостью, может быть изменена в функции обратного вызова
+  static muif_t muif_list[] = {
+    // Use "B0" for jump/goto buttons. This callback jumps to a new screen.
+    MUIF_BUTTON("B0", mui_u8g2_btn_goto_wm_fi),
 
+    /* horizontal line (hrule) */
+    MUIF_RO("HR", mui_hrule),
+    // Use "BN" for the exit button.
+    MUIF_BUTTON("BN", mui_u8g2_btn_exit_wm_fi),
+
+    MUIF_VARIABLE("VA", &brightness, mui_u8g2_u8_min_max_wm_mud_pi), // Links "VA" to the 'brightness' variable
+
+
+  };
+
+  static fds_t fds_data[] =
+  MUI_FORM(1)
+  MUI_XYT("BN", 14, 10, "Exit")
+  MUI_XYT("B0", 72, 10, "Вперед")
+  MUI_LABEL(72, 30, "Brightness:")
+  MUI_XY("HR", 0,15)
+  
+  MUI_FORM(2)
+  MUI_XYT("BN", 14, 10, "Exit")
+  MUI_XYT("B0", 72, 10, "Back")
+  MUI_LABEL(72, 30, "Brightness:")
+  ;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 u8g2_t myDisplay;
+mui_t myUI;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -138,7 +179,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  static GridWidget myGrid;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -147,6 +188,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -167,42 +209,27 @@ int main(void)
   u8g2_ClearBuffer(&myDisplay);
 
 
-  int count = 0;
+  mui_Init(&myUI, &myDisplay, fds_data, muif_list, sizeof(muif_list) / sizeof(muif_t));
 
-  char buffer[50];
-  // snprintf(buffer, sizeof(buffer), "%d", count);
+  
 
-  // ButtonState   btn_state1  = { .label = "Сәлем Әлем!", .on_press = NULL };
-  // ButtonState   btn_state2  = { .label = "Батырма басылды!", .on_press = NULL };
-  // Widget btn_widget = { .on_event = button_on_event, .render = button_render,
-  //                         .state = &btn_state1, .dirty = true };
-
-  // Widget btn_widget2 = { .on_event = button_on_event, .render = button_render,
-  //                         .state = &btn_state2, .dirty = true };
-  // btn_widget.render(&btn_widget, &myDisplay);
-  //   u8g2_SendBuffer(&myDisplay);
+  grid_init(&myGrid, 0, 0, 126, 64);
+  mui_GotoForm(
+      &myUI,
+      1, /* form id */
+      0  /* initial cursor position */
+    );
   while (1)
-  {
-    
-    /* USER CODE END WHILE */
-    // if (HAL_GPIO_ReadPin(Input_signal_GPIO_Port, Input_signal_Pin) == GPIO_PIN_SET) {
-    //     count++;
-    //     snprintf(buffer, sizeof(buffer), "%d", count);
-    //     btn_state2.label = buffer;
-    //     btn_widget2.dirty = true;
-    // }
-    // u8g2_DrawArc(&myDisplay, 64, 32, 30, 0, count * 6);
-    // if (btn_widget2.dirty) {
-    //     btn_widget2.render(&btn_widget2, &myDisplay);
-    // }
-    u8g2_SetDrawColor(&myDisplay, 1);
-    u8g2_DrawBox(&myDisplay, 0, 0, 127, 16);
-    u8g2_DrawRFrame(&myDisplay, 0, 18, 127, 16, 3);
-    u8g2_DrawTriangle(&myDisplay, 64, 50, 54, 60, 74, 60);
-    u8g2_SendBuffer(&myDisplay);
-    count++;
-    /* USER CODE BEGIN 3 */
-  }
+{
+    u8g2_SetFont(&myDisplay, u8g2_font_4x6_tn); // Установка шрифта для отображения текста
+    u8g2_FirstPage(&myDisplay);
+    do
+    {
+        u8g2_SetFont(&myDisplay, u8g2_font_6x12_tf);
+        mui_Draw(&myUI);
+    }
+    while (u8g2_NextPage(&myDisplay));
+}
   /* USER CODE END 3 */
 }
 
