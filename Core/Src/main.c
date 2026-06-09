@@ -221,11 +221,10 @@ int main(void)
     );
   while (1)
 {
-    u8g2_SetFont(&myDisplay, u8g2_font_4x6_tn); // Установка шрифта для отображения текста
     u8g2_FirstPage(&myDisplay);
     do
     {
-        u8g2_SetFont(&myDisplay, u8g2_font_6x12_tf);
+        u8g2_SetFont(&myDisplay, u8g2_font_6x12_t_cyrillic );
         mui_Draw(&myUI);
     }
     while (u8g2_NextPage(&myDisplay));
