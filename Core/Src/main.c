@@ -49,8 +49,9 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-SPI_HandleTypeDef hspi1;
-u8g2_t myDisplay;
+extern SPI_HandleTypeDef hspi1;
+extern uint8_t u8x8_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
+extern uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -120,12 +121,10 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   mui_port_init();
-
   /* USER CODE END 2 */
   while (1)
   {
-    mui_tick();
-    // mui_port_tick();
+    mui_port_tick();
   }
   /* USER CODE END 3 */
 }

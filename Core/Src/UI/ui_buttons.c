@@ -1,5 +1,7 @@
 #include "UI/mui_port.h"
 #include "main.h"
+#include <stdint.h>
+#include <stdio.h>
 
 typedef struct {
     uint8_t last_raw;
@@ -28,7 +30,7 @@ static uint8_t debounce(BtnState *b, uint8_t raw)
 
 uint8_t ui_read_buttons(void) {
     uint8_t sel = HAL_GPIO_ReadPin(Input_signal_GPIO_Port, Input_signal_Pin);
-    
+    printf("Raw button state: %d\n", sel);
     if (debounce(&btn_state, sel)) {
         return BTN_STEP; // Step button pressed
     }
