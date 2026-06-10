@@ -29,54 +29,18 @@
 #include "UI/button_widget.h"
 #include "UI/ui_grid.h"
 #include "mui.h"
+#include "UI/mui_port.h"
 /* USER CODE END Includes */
-uint8_t mui_hrule(mui_t *ui, uint8_t msg)
-{
-  u8g2_t *u8g2 = mui_get_U8g2(ui);
-  switch(msg)
-  {
-    case MUIF_MSG_DRAW:
-      u8g2_DrawHLine(u8g2, 0, mui_get_y(ui), u8g2_GetDisplayWidth(u8g2));
-      break;
-  }
-  return 0;
-}
+
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-  uint8_t brightness = 25; // Пример переменной для управления яркостью, может быть изменена в функции обратного вызова
-  static muif_t muif_list[] = {
-    // Use "B0" for jump/goto buttons. This callback jumps to a new screen.
-    MUIF_BUTTON("B0", mui_u8g2_btn_goto_wm_fi),
 
-    /* horizontal line (hrule) */
-    MUIF_RO("HR", mui_hrule),
-    // Use "BN" for the exit button.
-    MUIF_BUTTON("BN", mui_u8g2_btn_exit_wm_fi),
-
-    MUIF_VARIABLE("VA", &brightness, mui_u8g2_u8_min_max_wm_mud_pi), // Links "VA" to the 'brightness' variable
-
-
-  };
-
-  static fds_t fds_data[] =
-  MUI_FORM(1)
-  MUI_XYT("BN", 14, 10, "Exit")
-  MUI_XYT("B0", 72, 10, "Вперед")
-  MUI_LABEL(72, 30, "Brightness:")
-  MUI_XY("HR", 0,15)
-  
-  MUI_FORM(2)
-  MUI_XYT("BN", 14, 10, "Exit")
-  MUI_XYT("B0", 72, 10, "Back")
-  MUI_LABEL(72, 30, "Brightness:")
-  ;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-u8g2_t myDisplay;
-mui_t myUI;
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -86,7 +50,7 @@ mui_t myUI;
 
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi1;
-
+u8g2_t myDisplay;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -123,52 +87,7 @@ int _write(int file, char *ptr, int len)
     return len;
 }
 
-static uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
-{
-  (void)u8x8;
-  (void)arg_ptr;
 
-  switch (msg)
-  {
-  case U8X8_MSG_DELAY_MILLI:
-    HAL_Delay(arg_int);
-    break;
-  case U8X8_MSG_GPIO_CS:
-    HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, arg_int);
-    break;
-  case U8X8_MSG_GPIO_DC:
-    HAL_GPIO_WritePin(DC_GPIO_Port, DC_Pin, arg_int);
-    break;
-  case U8X8_MSG_GPIO_RESET:
-    HAL_GPIO_WritePin(RESET_GPIO_Port, RESET_Pin, arg_int);
-    break;
-  }
-
-  return 1;
-}
-
-static uint8_t u8x8_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
-{
-  (void)u8x8;
-
-  switch (msg)
-  {
-  case U8X8_MSG_BYTE_SET_DC:
-    HAL_GPIO_WritePin(DC_GPIO_Port, DC_Pin, arg_int);
-    break;
-  case U8X8_MSG_BYTE_SEND:
-    HAL_SPI_Transmit(&hspi1, (uint8_t *)arg_ptr, arg_int, 1000);
-    break;
-  case U8X8_MSG_BYTE_START_TRANSFER:
-    HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET);
-    break;
-  case U8X8_MSG_BYTE_END_TRANSFER:
-    HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET);
-    break;
-  }
-
-  return 1;
-}
 /* USER CODE END 0 */
 
 /**
@@ -179,7 +98,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  static GridWidget myGrid;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -188,7 +106,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -202,33 +119,14 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+  mui_port_init();
+
   /* USER CODE END 2 */
-  u8g2_Setup_sh1106_128x64_noname_f(&myDisplay, U8G2_R0, u8x8_spi, u8x8_gpio_and_delay);  // Инициализация u8g2-структуры
-  u8g2_InitDisplay(&myDisplay); // Отправка последовательности инициализации на дисплей, после чего дисплей переходит в спящий режим
-  u8g2_SetPowerSave(&myDisplay, 0); // Пробуждение дисплея
-  u8g2_ClearBuffer(&myDisplay);
-
-
-  mui_Init(&myUI, &myDisplay, fds_data, muif_list, sizeof(muif_list) / sizeof(muif_t));
-
-  
-
-  grid_init(&myGrid, 0, 0, 126, 64);
-  mui_GotoForm(
-      &myUI,
-      1, /* form id */
-      0  /* initial cursor position */
-    );
   while (1)
-{
-    u8g2_FirstPage(&myDisplay);
-    do
-    {
-        u8g2_SetFont(&myDisplay, u8g2_font_6x12_t_cyrillic );
-        mui_Draw(&myUI);
-    }
-    while (u8g2_NextPage(&myDisplay));
-}
+  {
+    mui_tick();
+    // mui_port_tick();
+  }
   /* USER CODE END 3 */
 }
 
