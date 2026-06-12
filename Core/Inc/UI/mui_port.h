@@ -6,6 +6,7 @@
 
 #define BTN_NONE 0
 #define BTN_STEP 1
+#define BTN_ENTER 2
 
 void mui_port_init(void);
 void mui_port_tick(void);
